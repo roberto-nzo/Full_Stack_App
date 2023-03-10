@@ -10,7 +10,7 @@ const colors = require('colors');
 const sequelize_1 = require("sequelize");
 const sequelize = new sequelize_1.Sequelize('mysql://root:@localhost:3306/school-sys');
 const { errorMiddleware } = require('./middleware/errorMiddleware');
-const DB = require('./config/db');
+// const DB = require('./config/db')
 const app = (0, express_1.default)();
 app.use(express_1.default.json());
 app.use(express_1.default.urlencoded({ extended: false }));

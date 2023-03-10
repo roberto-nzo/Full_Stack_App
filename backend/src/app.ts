@@ -6,7 +6,7 @@ import { Sequelize } from 'sequelize'
 const sequelize = new Sequelize('mysql://root:@localhost:3306/school-sys')
 const { errorMiddleware } = require('./middleware/errorMiddleware')
 import multer from 'multer'
-const DB = require('./config/db')
+// const DB = require('./config/db')
 const app: Application = express()
 
 app.use(express.json())
