@@ -9,6 +9,14 @@ import multer from 'multer'
 // const DB = require('./config/db')
 const app: Application = express()
 
+module.exports = (on: any, config: any) => {
+    config.production.username = process.env.username
+    config.production.password = process.env.password
+    config.production.database = process.env.database
+    config.production.host = process.env.host
+    config.production.dialect = process.env.dialect
+}
+
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
 // app.use(multer)
