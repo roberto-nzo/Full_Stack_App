@@ -1,0 +1,3 @@
+[submodule "Full_Stack_App_Frontend"]
+	path = Full_Stack_App_Frontend
+	url = https://github.com/roberto-nzo/Full_Stack_App_Frontend.git
