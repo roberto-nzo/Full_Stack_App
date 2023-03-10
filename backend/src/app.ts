@@ -22,6 +22,6 @@ app.use(errorMiddleware)
 
 const PORT = process.env.PORT || 8000
 
-DB()
+// DB()
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}...`))
