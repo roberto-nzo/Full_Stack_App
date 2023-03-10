@@ -10,9 +10,17 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const sequelize_1 = require("sequelize");
-const sequelize = new sequelize_1.Sequelize('mysql://root:@localhost:3306/school-sys', {
-    logging: false
-});
+let sequelize;
+if (process.env.NODE_ENV === 'production') {
+    sequelize = new sequelize_1.Sequelize(`${process.env.MYSQL_URL}`, {
+        logging: false
+    });
+}
+else {
+    sequelize = new sequelize_1.Sequelize('mysql://root:@localhost:3306/school-sys', {
+        logging: false
+    });
+}
 class Courses extends sequelize_1.Model {
 }
 Courses.init({

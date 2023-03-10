@@ -3,9 +3,17 @@ import { json } from 'stream/consumers'
 import Classes from './classes'
 import Courses from './courses'
 
-const sequelize = new Sequelize('mysql://root:@localhost:3306/school-sys', {
-  logging: false
-})
+let sequelize: any
+if (process.env.NODE_ENV === 'production') {
+  sequelize = new Sequelize(`${process.env.MYSQL_URL}`, {
+    logging: false
+  })
+} else {
+  sequelize = new Sequelize('mysql://root:@localhost:3306/school-sys', {
+    logging: false
+  })
+}
+
 
 
 class Students extends Model<InferAttributes<Students, { omit: never }>, InferCreationAttributes<Students, { omit: never }>>{

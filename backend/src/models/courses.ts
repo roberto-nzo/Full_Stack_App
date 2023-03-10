@@ -1,8 +1,16 @@
 import { Sequelize, Model, InferAttributes, InferCreationAttributes, DataTypes, CreationOptional } from 'sequelize'
 
-const sequelize = new Sequelize('mysql://root:@localhost:3306/school-sys', {
-  logging: false
-})
+let sequelize: any
+if (process.env.NODE_ENV === 'production') {
+  sequelize = new Sequelize(`${process.env.MYSQL_URL}`, {
+    logging: false
+  })
+} else {
+  sequelize = new Sequelize('mysql://root:@localhost:3306/school-sys', {
+    logging: false
+  })
+}
+
 
 class Courses extends Model<InferAttributes<Courses>, InferCreationAttributes<Courses>>{
   declare id: CreationOptional<number>

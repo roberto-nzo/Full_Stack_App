@@ -12,6 +12,13 @@ const sequelize = new sequelize_1.Sequelize('mysql://root:@localhost:3306/school
 const { errorMiddleware } = require('./middleware/errorMiddleware');
 // const DB = require('./config/db')
 const app = (0, express_1.default)();
+module.exports = (on, config) => {
+    config.production.username = process.env.username;
+    config.production.password = process.env.password;
+    config.production.database = process.env.database;
+    config.production.host = process.env.host;
+    config.production.dialect = process.env.dialect;
+};
 app.use(express_1.default.json());
 app.use(express_1.default.urlencoded({ extended: false }));
 // app.use(multer)
