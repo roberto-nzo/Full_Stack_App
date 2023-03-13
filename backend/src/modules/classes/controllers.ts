@@ -38,15 +38,17 @@ const oneClass = async (req: Request, res: Response) => {
 
 // Create a class
 const createclass = async (req: Request, res: Response) => {
-    if (!req.body.classname || !req.body.student) {
+    if (!req.body.classname) {
         res.status(400)
         throw new Error('Please complete all fields')
     } else {
-        const student = await Students.findByPk(req.body.student)
         const classes = await Classes.create({
             classname: req.body.classname,
         })
-        student?.setClass(classes)
+        if (!req.body.student) {
+            const student = await Students.findByPk(req.body.student)
+            student?.setClass(classes)
+        }
         res.status(200).json(classes)
     }
 }

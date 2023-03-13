@@ -49,16 +49,18 @@ const oneCourse = async (req: Request, res: Response) => {
 
 // Create a course
 const createCourse = async (req: Request, res: Response) => {
-    if (!req.body.courseData || !req.body.student) {
+    if (!req.body.courseData) {
         res.status(400)
         throw new Error('Please complete all fields')
     } else {
         try {
-            const student = await Students.findByPk(req.body.student)
             const course = await Courses.create({
                 coursename: req.body.courseData,
             })
-            await student?.addCourse(course)
+            if (!req.body.student) {
+                const student = await Students.findByPk(req.body.student)
+                await student?.addCourse(course)
+            }
             res.status(200).json(course)
         } catch (error: any) {
             res.status(400)
