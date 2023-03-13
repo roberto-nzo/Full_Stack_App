@@ -57,17 +57,19 @@ const oneCourse = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
 });
 // Create a course
 const createCourse = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    if (!req.body.courseData || !req.body.student) {
+    if (!req.body.courseData) {
         res.status(400);
         throw new Error('Please complete all fields');
     }
     else {
         try {
-            const student = yield students_1.default.findByPk(req.body.student);
             const course = yield courses_1.default.create({
                 coursename: req.body.courseData,
             });
-            yield (student === null || student === void 0 ? void 0 : student.addCourse(course));
+            if (req.body.student) {
+                const student = yield students_1.default.findByPk(req.body.student);
+                yield (student === null || student === void 0 ? void 0 : student.addCourse(course));
+            }
             res.status(200).json(course);
         }
         catch (error) {

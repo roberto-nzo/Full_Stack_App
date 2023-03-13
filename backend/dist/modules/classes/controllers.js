@@ -44,16 +44,18 @@ const oneClass = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
 });
 // Create a class
 const createclass = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    if (!req.body.classname || !req.body.student) {
+    if (!req.body.classname) {
         res.status(400);
         throw new Error('Please complete all fields');
     }
     else {
-        const student = yield students_1.default.findByPk(req.body.student);
         const classes = yield classes_1.default.create({
             classname: req.body.classname,
         });
-        student === null || student === void 0 ? void 0 : student.setClass(classes);
+        if (req.body.student) {
+            const student = yield students_1.default.findByPk(req.body.student);
+            student === null || student === void 0 ? void 0 : student.setClass(classes);
+        }
         res.status(200).json(classes);
     }
 });
