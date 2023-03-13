@@ -57,7 +57,7 @@ const createCourse = async (req: Request, res: Response) => {
             const course = await Courses.create({
                 coursename: req.body.courseData,
             })
-            if (!req.body.student) {
+            if (req.body.student) {
                 const student = await Students.findByPk(req.body.student)
                 await student?.addCourse(course)
             }

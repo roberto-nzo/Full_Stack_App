@@ -45,7 +45,7 @@ const createclass = async (req: Request, res: Response) => {
         const classes = await Classes.create({
             classname: req.body.classname,
         })
-        if (!req.body.student) {
+        if (req.body.student) {
             const student = await Students.findByPk(req.body.student)
             student?.setClass(classes)
         }
