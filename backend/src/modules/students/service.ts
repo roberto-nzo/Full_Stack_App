@@ -31,7 +31,7 @@ export default class StudentService {
             const courseitem = data.Courses
             let studentsCourses: any = []
             courseitem.forEach((std: any) => {
-                studentsCourses.push({ id: std.id, course: std.coursename })
+                studentsCourses.push(std.coursename )
             })
             // console.log(studentsCourses)
             studentsData.push({
