@@ -11,7 +11,7 @@ const allcourses = async (req: Request, res: Response) => {
         include: [
             {
                 model: Students,
-                attributes: { exclude: ['createdAt', 'updatedAt'] }
+                attributes: { exclude: ['deletedAt', 'createdAt', 'updatedAt'] }
             }
         ]
     })

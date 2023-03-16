@@ -8,7 +8,7 @@ import jwt from 'jsonwebtoken'
 export default class StudentService {
     getAllStudents = async () => {
         const fetchStudents = await Students.findAll({
-            attributes: { exclude: ['createdAt', 'updatedAt'] },
+            attributes: { exclude: ['createdAt', 'updatedAt', 'password'] },
             include: [
                 {
                     model: Courses,
@@ -23,14 +23,15 @@ export default class StudentService {
                 ['id', 'ASC']
             ]
         })
+        // console.log(fetchStudents)
 
         let studentsData: {}[] = []
         fetchStudents.forEach(item => {
             const data: any = item.dataValues
             const courseitem = data.Courses
             let studentsCourses: any = []
-            courseitem.forEach((std: { coursename: any }) => {
-                studentsCourses.push(std.coursename)
+            courseitem.forEach((std: any) => {
+                studentsCourses.push({ id: std.id, course: std.coursename })
             })
             // console.log(studentsCourses)
             studentsData.push({
@@ -188,25 +189,33 @@ export default class StudentService {
             throw new Error('Please complete all fields')
         }
 
-        const arrayCourse = await Courses.findAll()
-        const results = arrayCourse.map((item: any) => {
-            return item.dataValues.id
-        })
-
         const salt = await bcrypt.genSalt()
         const hashedpassword = await bcrypt.hash(req.body.password, salt)
+
+        console.log(req.body.firstname)
+        try {
+            
+        } catch (error) {
+            
+        }
         const std = await Students.create({
             firstname: req.body.firstname,
             lastname: req.body.lastname,
             age: req.body.age,
             password: hashedpassword
         })
+
         const token = this.generateToken(std.id)
 
         if (req.body.classname) {
             await std.setClass(req.body.classname)
         }
         if (req.body.courseData) {
+
+            const arrayCourse = await Courses.findAll()
+            const results = arrayCourse.map((item: any) => {
+                return item.dataValues.id
+            })
             await std.addCourse(req.body.courseData)
         }
 
@@ -266,19 +275,20 @@ export default class StudentService {
         }
         let courseid = null
         let classid: any = null
-        if (req.body.coursename) {
-            await std.setCourses([])
-            for (let i: number = 0; i < req.body.coursename.length; i++) {
-                console.log(req.body.coursename[i])
-                courseid = await Courses.findByPk(req.body.coursename[i])
-                if (!courseid) {
-                    res.status(400)
-                    throw new Error("Wrong course name")
-                } else {
-                    await std.addCourse(req.body.coursename[i])
-                }
-            }
-        } else { }
+        if (req.body.courseData) {
+            courseid = await Courses.findOne({ where: { coursename: req.body.courseData } })
+            await std.addCourse(courseid)
+            // await std.setCourses([])
+            // for (let i: number = 0; i < req.body.courseData.length; i++) {
+            //     courseid = await Courses.findByPk(req.body.courseData[i])
+            //     if (!courseid) {
+            //         res.status(400)
+            //         throw new Error("Wrong course name")
+            //     } else {
+            //         await std.addCourse(req.body.courseData[i])
+            //     }
+            // }
+        }
 
         let hashedpassword
         if (req.body.password) {
@@ -326,19 +336,27 @@ export default class StudentService {
     // delete student
     deleteStudent = async (req: Request, res: Response) => {
         const std = await Students.findByPk(req.params.id)
+        console.log(std)
 
         if (!std) {
             res.status(400)
             throw new Error("Student do not exist")
         }
 
-        await Students.destroy({
-            where: {
-                id: req.params.id
-            }
-        })
+        try {
 
-        res.status(200).json(std)
+            await Students.destroy({
+                where: {
+                    id: req.params.id
+                }
+            })
+
+            res.status(200).json(std)
+
+        } catch (error) {
+            res.status(401)
+            throw new Error
+        }
     }
 
     generateToken = (id: any) => {

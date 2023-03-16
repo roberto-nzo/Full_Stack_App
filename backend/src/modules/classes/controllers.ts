@@ -21,7 +21,6 @@ const allClasses = async (req: Request, res: Response) => {
         })
     }
     )
-    console.log(mapClasses)
     res.status(200).json(mapClasses)
 }
 
