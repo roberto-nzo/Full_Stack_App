@@ -12,80 +12,31 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const index_1 = __importDefault(require("../../models/index"));
-const classes_1 = __importDefault(require("../../models/classes"));
-const students_1 = __importDefault(require("../../models/students"));
+const service_1 = __importDefault(require("./service"));
+const classService = new service_1.default();
 // Select all classes
 const allClasses = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const classes = yield index_1.default.Classes.findAll({
-        include: {
-            model: index_1.default.Students,
-            // separate: true,
-            attributes: { exclude: ['createdAt', 'updatedAt', 'ClassId'] }
-        }
-    });
-    const mapClasses = classes.map((clas) => {
-        return ({
-            id: clas.id,
-            class: clas.classname,
-            students: clas.Students
-        });
-    });
-    console.log(mapClasses);
-    res.status(200).json(mapClasses);
+    const allclasses = yield classService.allClasses(res);
+    res.status(200).json(allclasses);
 });
 // Select one class
 const oneClass = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const classes = yield index_1.default.Classes.findByPk(req.params.id);
-    if (!classes) {
-        res.status(400);
-    }
-    res.status(200).json(classes);
+    const oneclass = yield classService.oneClass(req, res);
+    res.status(200).json(oneclass);
 });
 // Create a class
 const createclass = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    if (!req.body.classname) {
-        res.status(400);
-        throw new Error('Please complete all fields');
-    }
-    else {
-        const classes = yield classes_1.default.create({
-            classname: req.body.classname,
-        });
-        if (req.body.student) {
-            const student = yield students_1.default.findByPk(req.body.student);
-            student === null || student === void 0 ? void 0 : student.setClass(classes);
-        }
-        res.status(200).json(classes);
-    }
+    const createclass = yield classService.createClass(req, res);
+    res.status(200).json(createclass);
 });
 // Update a class
 const updtClass = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const classes = yield classes_1.default.findByPk(req.params.id);
-    if (!classes) {
-        res.status(400);
-        throw new Error('Class not found');
-    }
-    const updtClass = yield classes_1.default.update({ classname: req.body.classname ? req.body.classname : classes.classname }, {
-        where: {
-            id: req.params.id
-        }
-    });
-    const updtedclass = yield classes_1.default.findByPk(req.params.id);
-    res.status(200).json(updtedclass);
+    const updateClass = yield classService.updateClass(req, res);
+    res.status(200).json(updateClass);
 });
 // Delete a class
 const deleteClass = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const classes = yield classes_1.default.findByPk(req.params.id);
-    if (!classes) {
-        res.status(400);
-        throw new Error("Student do not exist");
-    }
-    yield classes_1.default.destroy({
-        where: {
-            id: req.params.id
-        }
-    });
-    res.status(200).json(classes);
+    const deleteClass = yield classService.deleteClass(req, res);
+    res.status(200).json(deleteClass);
 });
 exports.default = { allClasses, oneClass, createclass, updtClass, deleteClass };

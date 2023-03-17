@@ -21,7 +21,7 @@ class StudentService {
     constructor() {
         this.getAllStudents = () => __awaiter(this, void 0, void 0, function* () {
             const fetchStudents = yield students_1.default.findAll({
-                attributes: { exclude: ['createdAt', 'updatedAt'] },
+                attributes: { exclude: ['createdAt', 'updatedAt', 'password'] },
                 include: [
                     {
                         model: courses_1.default,
@@ -36,6 +36,7 @@ class StudentService {
                     ['id', 'ASC']
                 ]
             });
+            // console.log(fetchStudents)
             let studentsData = [];
             fetchStudents.forEach(item => {
                 const data = item.dataValues;
@@ -189,12 +190,13 @@ class StudentService {
                 res.status(400);
                 throw new Error('Please complete all fields');
             }
-            const arrayCourse = yield courses_1.default.findAll();
-            const results = arrayCourse.map((item) => {
-                return item.dataValues.id;
-            });
             const salt = yield bcryptjs_1.default.genSalt();
             const hashedpassword = yield bcryptjs_1.default.hash(req.body.password, salt);
+            console.log(req.body.firstname);
+            try {
+            }
+            catch (error) {
+            }
             const std = yield students_1.default.create({
                 firstname: req.body.firstname,
                 lastname: req.body.lastname,
@@ -206,6 +208,10 @@ class StudentService {
                 yield std.setClass(req.body.classname);
             }
             if (req.body.courseData) {
+                const arrayCourse = yield courses_1.default.findAll();
+                const results = arrayCourse.map((item) => {
+                    return item.dataValues.id;
+                });
                 yield std.addCourse(req.body.courseData);
             }
             // if (req.body.classname) {
@@ -255,21 +261,20 @@ class StudentService {
             }
             let courseid = null;
             let classid = null;
-            if (req.body.coursename) {
-                yield std.setCourses([]);
-                for (let i = 0; i < req.body.coursename.length; i++) {
-                    console.log(req.body.coursename[i]);
-                    courseid = yield courses_1.default.findByPk(req.body.coursename[i]);
-                    if (!courseid) {
-                        res.status(400);
-                        throw new Error("Wrong course name");
-                    }
-                    else {
-                        yield std.addCourse(req.body.coursename[i]);
-                    }
-                }
+            if (req.body.courseData) {
+                courseid = yield courses_1.default.findOne({ where: { coursename: req.body.courseData } });
+                yield std.addCourse(courseid);
+                // await std.setCourses([])
+                // for (let i: number = 0; i < req.body.courseData.length; i++) {
+                //     courseid = await Courses.findByPk(req.body.courseData[i])
+                //     if (!courseid) {
+                //         res.status(400)
+                //         throw new Error("Wrong course name")
+                //     } else {
+                //         await std.addCourse(req.body.courseData[i])
+                //     }
+                // }
             }
-            else { }
             let hashedpassword;
             if (req.body.password) {
                 const salt = yield bcryptjs_1.default.genSalt();
@@ -312,16 +317,23 @@ class StudentService {
         // delete student
         this.deleteStudent = (req, res) => __awaiter(this, void 0, void 0, function* () {
             const std = yield students_1.default.findByPk(req.params.id);
+            console.log(std);
             if (!std) {
                 res.status(400);
                 throw new Error("Student do not exist");
             }
-            yield students_1.default.destroy({
-                where: {
-                    id: req.params.id
-                }
-            });
-            res.status(200).json(std);
+            try {
+                yield students_1.default.destroy({
+                    where: {
+                        id: req.params.id
+                    }
+                });
+                res.status(200).json(std);
+            }
+            catch (error) {
+                res.status(401);
+                throw new Error;
+            }
         });
         this.generateToken = (id) => {
             return jsonwebtoken_1.default.sign({ id }, process.env.JWT_SECRET);
