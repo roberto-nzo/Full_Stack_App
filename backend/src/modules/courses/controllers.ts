@@ -1,110 +1,37 @@
-import { Application, Request, Response, NextFunction } from 'express'
-import models from '../../models/index'
-import Courses from '../../models/courses'
-import Students from '../../models/students'
-import Classes from '../../models/classes'
+import { Request, Response } from 'express'
+import CourseService from './service'
+
+const courseService = new CourseService()
 
 
 // Select all courses
 const allcourses = async (req: Request, res: Response) => {
-    const courses: any = await models.Courses.findAll({
-        include: [
-            {
-                model: Students,
-                attributes: { exclude: ['deletedAt', 'createdAt', 'updatedAt'] }
-            }
-        ]
-    })
-    // console.log(courses.map((course: any) => { return course.Students }))
-    res.status(200).json(courses)
+    const allcourses = await courseService.allCourses(res)
+    res.status(200).json(allcourses)
 }
 
 // Select one course
 const oneCourse = async (req: Request, res: Response) => {
-    const course: any = await models.Courses.findByPk(req.params.id, {
-        include: [{
-            model: Students,
-            attributes: { exclude: ['createdAt', 'updatedAt', 'age', 'ClassId', 'StudentsCourses'] }
-        }]
-    })
-
-    if (!course) {
-        res.status(400).json({
-            message: `Course of id ${req.params.id} don't exist!`
-        })
-    } else {
-        res.status(200).json({
-            id: course?.id,
-            course: course?.coursename,
-            students: course.Students.map((std: any) => {
-                return ({
-                    id: std.id,
-                    firstname: std.firstname,
-                    lastname: std.lastname
-                })
-            })
-        })
-    }
+    const onecourse = await courseService.oneCourse(req, res)
+    res.status(200).json(onecourse)
 }
 
 // Create a course
 const createCourse = async (req: Request, res: Response) => {
-    if (!req.body.courseData) {
-        res.status(400)
-        throw new Error('Please complete all fields')
-    } else {
-        try {
-            const course = await Courses.create({
-                coursename: req.body.courseData,
-            })
-            if (req.body.student) {
-                const student = await Students.findByPk(req.body.student)
-                await student?.addCourse(course)
-            }
-            res.status(200).json(course)
-        } catch (error: any) {
-            res.status(400)
-            throw new Error
-        }
-    }
+    const createcourse = await courseService.createCourse(req, res)
+    res.status(200).json(createcourse)
 }
 
 // Update a course
 const updtCourse = async (req: Request, res: Response) => {
-    const course = await Courses.findByPk(req.params.id)
-
-    if (!course) {
-        res.status(400)
-        throw new Error('Course not found')
-    }
-
-    const updtedCourse = await Courses.update({ coursename: req.body.coursename ? req.body.coursename : course.coursename }, {
-        where: {
-            id: req.params.id
-        }
-    })
-
-    const updtedcourse = await Courses.findByPk(req.params.id)
-
-    res.status(200).json(updtedcourse)
+    const updateCourse = await courseService.updateCourse(req, res)
+    res.status(200).json(updateCourse)
 }
 
 // Delete a course
 const deleteCourse = async (req: Request, res: Response) => {
-    const course = await Courses.findByPk(req.params.id)
-
-    if (!course) {
-        res.status(400)
-        throw new Error("Class do not exist")
-    }
-
-    await Courses.destroy({
-        where: {
-            id: req.params.id
-        }
-    })
-
-    res.status(200).json(course)
+    const deleteCourse = await courseService.deleteCourse(req, res)
+    res.status(200).json(deleteCourse)
 }
 
 export default { allcourses, oneCourse, createCourse, updtCourse, deleteCourse }
