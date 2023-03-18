@@ -3,7 +3,7 @@ import models from "../../models"
 
 export default class ClassService {
     // Get all classes
-    allClasses = async (res: Response) => {
+    allClasses = async () => {
         const classes: any = await models.Classes.findAll({
             include: {
                 model: models.Students,
@@ -17,7 +17,8 @@ export default class ClassService {
                 students: clas.Students
             })
         })
-        res.status(200).json(mapClasses)
+
+        return mapClasses
     }
 
     // Get one class
@@ -34,18 +35,26 @@ export default class ClassService {
 
     // Create a class
     createClass = async (req: Request, res: Response) => {
-        if (!req.body.classname) {
-            res.status(400)
-            throw new Error('Please complete all fields')
-        } else {
-            const classes = await models.Classes.create({
-                classname: req.body.classname,
-            })
-            if (req.body.student) {
-                const student = await models.Students.findByPk(req.body.student)
-                student?.setClass(classes)
+        try {
+            if (!req.body.classname) {
+                res.status(400)
+                throw new Error('Fill required field!')
             }
-            res.status(200).json(classes)
+            const fetchClass = await models.Classes.findOne({ where: { classname: req.body.classname } })
+            if (!fetchClass) {
+                const classes = await models.Classes.create({
+                    classname: req.body.classname,
+                })
+                if (req.body.student) {
+                    const student = await models.Students.findByPk(req.body.student)
+                    student?.setClass(classes)
+                }
+                res.status(200).json(classes)
+            }
+
+        } catch (error) {
+            res.status(401)
+            throw new Error('Something went wrong')
         }
     }
 
@@ -71,19 +80,19 @@ export default class ClassService {
 
     // Delete a class
     deleteClass = async (req: Request, res: Response) => {
-        const classes = await models.Classes.findByPk(req.params.id)
+        try {
+            const classes = await models.Classes.findByPk(req.params.id)
 
-        if (!classes) {
-            res.status(400)
-            throw new Error("Student do not exist")
+            await models.Classes.destroy({
+                where: {
+                    id: req.params.id
+                }
+            })
+            res.status(200).json(classes)
+        } catch (error) {
+            res.status(401)
+            throw new Error("Something went wrong")
         }
 
-        await models.Classes.destroy({
-            where: {
-                id: req.params.id
-            }
-        })
-
-        res.status(200).json(classes)
     }
 }

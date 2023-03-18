@@ -71,7 +71,7 @@ class StudentService {
                     }
                 ]
             });
-            console.log(findStudent);
+            // console.log(findStudent)
             if (findStudent !== null) {
                 const findCourses = findStudent.Courses;
                 let eachCourse = [];
@@ -192,7 +192,7 @@ class StudentService {
             }
             const salt = yield bcryptjs_1.default.genSalt();
             const hashedpassword = yield bcryptjs_1.default.hash(req.body.password, salt);
-            console.log(req.body.firstname);
+            // console.log(req.body.firstname)
             try {
             }
             catch (error) {
@@ -261,6 +261,7 @@ class StudentService {
             }
             let courseid = null;
             let classid = null;
+            console.log(req.body.courseData);
             if (req.body.courseData) {
                 courseid = yield courses_1.default.findOne({ where: { coursename: req.body.courseData } });
                 yield std.addCourse(courseid);
@@ -281,43 +282,60 @@ class StudentService {
                 hashedpassword = yield bcryptjs_1.default.hash(req.body.password, salt);
             }
             if (req.body.classname) {
-                classid = yield classes_1.default.findOne({ where: { classname: req.body.classname } });
-                yield students_1.default.update({ firstname: req.body.firstname ? req.body.firstname : std.firstname, lastname: req.body.lastname ? req.body.lastname : std.lastname, age: req.body.age ? req.body.age : std.age, password: req.body.password ? hashedpassword : std.password, ClassId: classid.id ? classid.id : null }, {
-                    where: {
-                        id: req.params.id
-                    }
-                });
-                const updtedstd = yield students_1.default.findByPk(req.params.id, {
-                    include: [
-                        {
-                            model: courses_1.default,
-                            attributes: { exclude: ['createdAt', 'updatedAt'] }
-                        }
-                    ]
-                });
-                res.status(200).json(updtedstd);
+                // console.log("there is a classname")
+                try {
+                    classid = yield classes_1.default.findOne({ where: { classname: req.body.classname } });
+                    // console.log(classid)
+                    yield std.setClass(classid);
+                }
+                catch (error) {
+                    res.status(401);
+                    throw new Error('Invalid class name');
+                }
             }
             else {
-                yield students_1.default.update({ firstname: req.body.firstname ? req.body.firstname : std.firstname, lastname: req.body.lastname ? req.body.lastname : std.lastname, age: req.body.age ? req.body.age : std.age, password: req.body.password ? hashedpassword : std.password }, {
-                    where: {
-                        id: req.params.id
+                // console.log("No classname")
+            }
+            yield students_1.default.update({ firstname: req.body.firstname ? req.body.firstname : std.firstname, lastname: req.body.lastname ? req.body.lastname : std.lastname, age: req.body.age ? req.body.age : std.age, password: req.body.password ? hashedpassword : std.password }, {
+                where: {
+                    id: req.params.id
+                }
+            });
+            const updtedstd = yield students_1.default.findByPk(req.params.id, {
+                include: [
+                    {
+                        model: courses_1.default,
+                        attributes: { exclude: ['createdAt', 'updatedAt'] }
                     }
-                });
-                const updtedstd = yield students_1.default.findByPk(req.params.id, {
-                    include: [
-                        {
-                            model: courses_1.default,
-                            attributes: { exclude: ['createdAt', 'updatedAt'] }
-                        }
-                    ]
-                });
-                res.status(200).json(updtedstd);
+                ]
+            });
+            res.status(200).json(updtedstd);
+        });
+        // Remove a course
+        this.removeCourse = (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const std = yield students_1.default.findByPk(req.params.id);
+            if (!std) {
+                res.status(400);
+                throw new Error('Student do not exist');
+            }
+            let courseid;
+            console.log(req.body);
+            for (let i = 0; i < req.body.removeCourseData.length; i++) {
+                courseid = yield courses_1.default.findOne({ where: { coursename: req.body.removeCourseData[i] } });
+                // console.log(courseid?.dataValues)
+                if (!courseid) {
+                    res.status(400);
+                    throw new Error("Wrong course name");
+                }
+                else {
+                    yield std.removeCourse(courseid.id);
+                }
             }
         });
         // delete student
         this.deleteStudent = (req, res) => __awaiter(this, void 0, void 0, function* () {
             const std = yield students_1.default.findByPk(req.params.id);
-            console.log(std);
+            // console.log(std)
             if (!std) {
                 res.status(400);
                 throw new Error("Student do not exist");

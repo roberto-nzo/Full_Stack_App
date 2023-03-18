@@ -5,7 +5,7 @@ import models from "../../models";
 export default class CourseService {
 
     //Get All courses
-    allCourses = async (res: Response) => {
+    allCourses = async () => {
         const courses = await models.Courses.findAll({
             include: [
                 {
@@ -15,7 +15,7 @@ export default class CourseService {
             ]
         })
 
-        res.status(200).json(courses)
+        return courses
     }
 
     // Get One course

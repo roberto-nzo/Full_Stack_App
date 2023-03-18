@@ -16,7 +16,7 @@ const models_1 = __importDefault(require("../../models"));
 class ClassService {
     constructor() {
         // Get all classes
-        this.allClasses = (res) => __awaiter(this, void 0, void 0, function* () {
+        this.allClasses = () => __awaiter(this, void 0, void 0, function* () {
             const classes = yield models_1.default.Classes.findAll({
                 include: {
                     model: models_1.default.Students,
@@ -30,7 +30,7 @@ class ClassService {
                     students: clas.Students
                 });
             });
-            res.status(200).json(mapClasses);
+            return mapClasses;
         });
         // Get one class
         this.oneClass = (req, res) => __awaiter(this, void 0, void 0, function* () {
@@ -45,19 +45,26 @@ class ClassService {
         });
         // Create a class
         this.createClass = (req, res) => __awaiter(this, void 0, void 0, function* () {
-            if (!req.body.classname) {
-                res.status(400);
-                throw new Error('Please complete all fields');
-            }
-            else {
-                const classes = yield models_1.default.Classes.create({
-                    classname: req.body.classname,
-                });
-                if (req.body.student) {
-                    const student = yield models_1.default.Students.findByPk(req.body.student);
-                    student === null || student === void 0 ? void 0 : student.setClass(classes);
+            try {
+                if (!req.body.classname) {
+                    res.status(400);
+                    throw new Error('Fill required field!');
                 }
-                res.status(200).json(classes);
+                const fetchClass = yield models_1.default.Classes.findOne({ where: { classname: req.body.classname } });
+                if (!fetchClass) {
+                    const classes = yield models_1.default.Classes.create({
+                        classname: req.body.classname,
+                    });
+                    if (req.body.student) {
+                        const student = yield models_1.default.Students.findByPk(req.body.student);
+                        student === null || student === void 0 ? void 0 : student.setClass(classes);
+                    }
+                    res.status(200).json(classes);
+                }
+            }
+            catch (error) {
+                res.status(401);
+                throw new Error('Something went wrong');
             }
         });
         // Update a class
@@ -77,17 +84,19 @@ class ClassService {
         });
         // Delete a class
         this.deleteClass = (req, res) => __awaiter(this, void 0, void 0, function* () {
-            const classes = yield models_1.default.Classes.findByPk(req.params.id);
-            if (!classes) {
-                res.status(400);
-                throw new Error("Student do not exist");
+            try {
+                const classes = yield models_1.default.Classes.findByPk(req.params.id);
+                yield models_1.default.Classes.destroy({
+                    where: {
+                        id: req.params.id
+                    }
+                });
+                res.status(200).json(classes);
             }
-            yield models_1.default.Classes.destroy({
-                where: {
-                    id: req.params.id
-                }
-            });
-            res.status(200).json(classes);
+            catch (error) {
+                res.status(401);
+                throw new Error("Something went wrong");
+            }
         });
     }
 }

@@ -31,7 +31,7 @@ export default class StudentService {
             const courseitem = data.Courses
             let studentsCourses: any = []
             courseitem.forEach((std: any) => {
-                studentsCourses.push(std.coursename )
+                studentsCourses.push(std.coursename)
             })
             // console.log(studentsCourses)
             studentsData.push({
@@ -61,7 +61,7 @@ export default class StudentService {
                 }
             ]
         })
-        console.log(findStudent)
+        // console.log(findStudent)
 
         if (findStudent !== null) {
 
@@ -192,11 +192,11 @@ export default class StudentService {
         const salt = await bcrypt.genSalt()
         const hashedpassword = await bcrypt.hash(req.body.password, salt)
 
-        console.log(req.body.firstname)
+        // console.log(req.body.firstname)
         try {
-            
+
         } catch (error) {
-            
+
         }
         const std = await Students.create({
             firstname: req.body.firstname,
@@ -275,6 +275,7 @@ export default class StudentService {
         }
         let courseid = null
         let classid: any = null
+        console.log(req.body.courseData)
         if (req.body.courseData) {
             courseid = await Courses.findOne({ where: { coursename: req.body.courseData } })
             await std.addCourse(courseid)
@@ -297,46 +298,62 @@ export default class StudentService {
         }
 
         if (req.body.classname) {
-            classid = await Classes.findOne({ where: { classname: req.body.classname } })
-            await Students.update({ firstname: req.body.firstname ? req.body.firstname : std.firstname, lastname: req.body.lastname ? req.body.lastname : std.lastname, age: req.body.age ? req.body.age : std.age, password: req.body.password ? hashedpassword : std.password, ClassId: classid.id ? classid.id : null }, {
-                where: {
-                    id: req.params.id
-                }
-            })
-
-            const updtedstd = await Students.findByPk(req.params.id, {
-                include: [
-                    {
-                        model: Courses,
-                        attributes: { exclude: ['createdAt', 'updatedAt'] }
-                    }
-                ]
-            })
-
-            res.status(200).json(updtedstd)
+            // console.log("there is a classname")
+            try {
+                classid = await Classes.findOne({ where: { classname: req.body.classname } })
+                // console.log(classid)
+                await std.setClass(classid)
+            } catch (error) {
+                res.status(401)
+                throw new Error('Invalid class name')
+            }
         } else {
-            await Students.update({ firstname: req.body.firstname ? req.body.firstname : std.firstname, lastname: req.body.lastname ? req.body.lastname : std.lastname, age: req.body.age ? req.body.age : std.age, password: req.body.password ? hashedpassword : std.password }, {
-                where: {
-                    id: req.params.id
-                }
-            })
-            const updtedstd = await Students.findByPk(req.params.id, {
-                include: [
-                    {
-                        model: Courses,
-                        attributes: { exclude: ['createdAt', 'updatedAt'] }
-                    }
-                ]
-            })
+            // console.log("No classname")
+        }
 
-            res.status(200).json(updtedstd)
+        await Students.update({ firstname: req.body.firstname ? req.body.firstname : std.firstname, lastname: req.body.lastname ? req.body.lastname : std.lastname, age: req.body.age ? req.body.age : std.age, password: req.body.password ? hashedpassword : std.password }, {
+            where: {
+                id: req.params.id
+            }
+        })
+        const updtedstd = await Students.findByPk(req.params.id, {
+            include: [
+                {
+                    model: Courses,
+                    attributes: { exclude: ['createdAt', 'updatedAt'] }
+                }
+            ]
+        })
+
+        res.status(200).json(updtedstd)
+
+    }
+
+    // Remove a course
+    removeCourse = async (req: Request, res: Response) => {
+        const std = await Students.findByPk(req.params.id)
+        if (!std) {
+            res.status(400)
+            throw new Error('Student do not exist')
+        }
+        let courseid: any
+        console.log(req.body)
+        for (let i: number = 0; i < req.body.removeCourseData.length; i++) {
+            courseid = await Courses.findOne({ where: { coursename: req.body.removeCourseData[i] } })
+            // console.log(courseid?.dataValues)
+            if (!courseid) {
+                res.status(400)
+                throw new Error("Wrong course name")
+            } else {
+                await std.removeCourse(courseid.id)
+            }
         }
     }
 
     // delete student
     deleteStudent = async (req: Request, res: Response) => {
         const std = await Students.findByPk(req.params.id)
-        console.log(std)
+        // console.log(std)
 
         if (!std) {
             res.status(400)

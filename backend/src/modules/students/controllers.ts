@@ -54,6 +54,12 @@ const selectCourse = expressAsyncHandler(async (req: Request, res: Response) => 
     res.status(200).json(addCourse)
 })
 
+// Student remove a course
+const removeCourse = expressAsyncHandler(async (req: Request, res: Response) => {
+    const removeCourse = await studentService.removeCourse(req, res)
+    res.status(200).json(removeCourse)
+})
+
 // Student select a class
 const selectClass = expressAsyncHandler(async (req: Request, res: Response) => {
     const setClass = await studentService.setClass(req, res)
@@ -73,4 +79,4 @@ const deleteStudent = expressAsyncHandler(async (req: Request, res: Response) =>
 })
 
 
-export default { allStudents, oneStudent, createStudent, updtstudent, deleteStudent, selectCourse, selectClass, loginStudent, upload }
+export default { allStudents, oneStudent, createStudent, updtstudent, deleteStudent, selectCourse, removeCourse, selectClass, loginStudent, upload }

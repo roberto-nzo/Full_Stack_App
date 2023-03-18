@@ -6,7 +6,7 @@ const classService = new ClassService()
 
 // Select all classes
 const allClasses = async (req: Request, res: Response) => {
-    const allclasses = await classService.allClasses(res)
+    const allclasses = await classService.allClasses()
     res.status(200).json(allclasses)
 }
 

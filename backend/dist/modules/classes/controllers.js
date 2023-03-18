@@ -16,7 +16,7 @@ const service_1 = __importDefault(require("./service"));
 const classService = new service_1.default();
 // Select all classes
 const allClasses = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const allclasses = yield classService.allClasses(res);
+    const allclasses = yield classService.allClasses();
     res.status(200).json(allclasses);
 });
 // Select one class

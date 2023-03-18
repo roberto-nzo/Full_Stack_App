@@ -55,6 +55,11 @@ const selectCourse = (0, express_async_handler_1.default)((req, res) => __awaite
     const addCourse = yield studentService.setCourse(req, res);
     res.status(200).json(addCourse);
 }));
+// Student remove a course
+const removeCourse = (0, express_async_handler_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const removeCourse = yield studentService.removeCourse(req, res);
+    res.status(200).json(removeCourse);
+}));
 // Student select a class
 const selectClass = (0, express_async_handler_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const setClass = yield studentService.setClass(req, res);
@@ -70,4 +75,4 @@ const deleteStudent = (0, express_async_handler_1.default)((req, res) => __await
     const deleteStudent = yield studentService.deleteStudent(req, res);
     res.status(200).json(deleteStudent);
 }));
-exports.default = { allStudents, oneStudent, createStudent, updtstudent, deleteStudent, selectCourse, selectClass, loginStudent, upload };
+exports.default = { allStudents, oneStudent, createStudent, updtstudent, deleteStudent, selectCourse, removeCourse, selectClass, loginStudent, upload };

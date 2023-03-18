@@ -6,7 +6,7 @@ const courseService = new CourseService()
 
 // Select all courses
 const allcourses = async (req: Request, res: Response) => {
-    const allcourses = await courseService.allCourses(res)
+    const allcourses = await courseService.allCourses()
     res.status(200).json(allcourses)
 }
 

@@ -1,4 +1,4 @@
-import { Sequelize, Model, InferAttributes, InferCreationAttributes, DataTypes, CreationOptional, HasManyAddAssociationMixin, Association, HasManySetAssociationsMixin, HasManyGetAssociationsMixin, HasOneSetAssociationMixin } from 'sequelize'
+import { Sequelize, Model, InferAttributes, InferCreationAttributes, DataTypes, CreationOptional, HasManyAddAssociationMixin, Association, HasManySetAssociationsMixin, HasManyGetAssociationsMixin, HasOneSetAssociationMixin, HasManyRemoveAssociationsMixin } from 'sequelize'
 import { json } from 'stream/consumers'
 import Classes from './classes'
 import Courses from './courses'
@@ -30,6 +30,7 @@ class Students extends Model<InferAttributes<Students, { omit: never }>, InferCr
   declare getCourse: HasManyGetAssociationsMixin<Courses>
   declare addCourse: HasManyAddAssociationMixin<Courses, 'id'>
   declare setCourses: HasManySetAssociationsMixin<Courses, 'id'>
+  declare removeCourse: HasManyRemoveAssociationsMixin<Courses, 'id'>
   declare setClass: HasOneSetAssociationMixin<Classes, 'id'>
 
   declare static associations: {

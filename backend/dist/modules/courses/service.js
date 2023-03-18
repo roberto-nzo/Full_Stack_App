@@ -16,7 +16,7 @@ const models_1 = __importDefault(require("../../models"));
 class CourseService {
     constructor() {
         //Get All courses
-        this.allCourses = (res) => __awaiter(this, void 0, void 0, function* () {
+        this.allCourses = () => __awaiter(this, void 0, void 0, function* () {
             const courses = yield models_1.default.Courses.findAll({
                 include: [
                     {
@@ -25,7 +25,7 @@ class CourseService {
                     }
                 ]
             });
-            res.status(200).json(courses);
+            return courses;
         });
         // Get One course
         this.oneCourse = (req, res) => __awaiter(this, void 0, void 0, function* () {

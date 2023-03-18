@@ -9,7 +9,8 @@ const router = express_1.default.Router();
 const controllers_1 = __importDefault(require("./controllers"));
 router.route('/students').get(authMiddleware_1.default, controllers_1.default.allStudents).post(controllers_1.default.createStudent);
 router.route('/students/:id').get(controllers_1.default.oneStudent).patch(controllers_1.default.updtstudent).delete(controllers_1.default.deleteStudent);
-router.route('/students/course/:id').patch(controllers_1.default.selectCourse);
+// router.route('/students/course/:id').patch(routes.selectCourse)
+router.route('/students/course/:id').post(controllers_1.default.removeCourse);
 router.route('/students/class/:id').patch(controllers_1.default.selectClass);
 router.route('/students/login').post(controllers_1.default.loginStudent);
 module.exports = router;

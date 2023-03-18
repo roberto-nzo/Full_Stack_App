@@ -16,7 +16,7 @@ const service_1 = __importDefault(require("./service"));
 const courseService = new service_1.default();
 // Select all courses
 const allcourses = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const allcourses = yield courseService.allCourses(res);
+    const allcourses = yield courseService.allCourses();
     res.status(200).json(allcourses);
 });
 // Select one course
